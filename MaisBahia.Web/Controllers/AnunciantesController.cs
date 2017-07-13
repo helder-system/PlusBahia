@@ -6,30 +6,44 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using MaisBahia.AcessoDados;
+using MaisBahia.DataAccess;
 using MaisBahia.Models;
+using MaisBahia.Repository;
 
-namespace MaisBahia.Controllers
+namespace MaisBahia.Web.Controllers
 {
     public class AnunciantesController : Controller
     {
-        private AnuncianteContexto db = new AnuncianteContexto();
+        private AnuncianteRepository anuncianteRepository;
 
+        private MaisBahiaContext db = new MaisBahiaContext();
         // GET: Anunciantes
+        public AnunciantesController()
+        {
+            if (anuncianteRepository == null)
+            {
+                anuncianteRepository = new AnuncianteRepository();
+            }
+        }
+
         public ActionResult Index()
         {
-            var anunciantes = db.Anunciantes.Include(a => a.Categoria).Include(a => a.Plano);
-            return View(anunciantes.ToList());
+            return View(anuncianteRepository.ObterTodos());
+        }
+
+        public ActionResult Lista()
+        {
+            return View(anuncianteRepository.ObterTodos());
         }
 
         // GET: Anunciantes/Details/5
-        public ActionResult Details(int? id)
+        public ActionResult Detalhar(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Anunciante anunciante = db.Anunciantes.Find(id);
+            Anunciante anunciante = anuncianteRepository.ObterPorId(id);
             if (anunciante == null)
             {
                 return HttpNotFound();
@@ -38,9 +52,10 @@ namespace MaisBahia.Controllers
         }
 
         // GET: Anunciantes/Create
-        public ActionResult Create()
+        public ActionResult Criar()
         {
             ViewBag.CategoriaId = new SelectList(db.Categorias, "Id", "Nome");
+            ViewBag.FotoId = new SelectList(db.Fotos, "Id", "Titulo");
             ViewBag.PlanoId = new SelectList(db.Planos, "Id", "Nome");
             return View();
         }
@@ -50,13 +65,21 @@ namespace MaisBahia.Controllers
         // obter mais detalhes, consulte https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,Nome,Endereco,Telefone,Email,Descricao,CategoriaId,PlanoId")] Anunciante anunciante)
+        public ActionResult Criar([Bind(Include = "Id,Nome,Endereco,Telefone,Email,Descricao,CategoriaId,PlanoId")] Anunciante anunciante, HttpPostedFileBase Imagem)
         {
             if (ModelState.IsValid)
             {
-                db.Anunciantes.Add(anunciante);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (Imagem != null)
+                {
+                    //informa qual o tipo do arquivo Array de bytes.
+                    anunciante.MimeType = Imagem.ContentType;
+                    //informa qual o tamanho do arquivo Array de bytes.
+                    anunciante.ArquivoFoto = new byte[Imagem.ContentLength];
+                    //Passar o arquivo carregado pelo usuário para o dentro do Array de bytes que foi criado. 
+                    Imagem.InputStream.Read(anunciante.ArquivoFoto, 0, Imagem.ContentLength);  
+                }
+                anuncianteRepository.Adiciconar(anunciante);
+                return RedirectToAction("Lista");
             }
 
             ViewBag.CategoriaId = new SelectList(db.Categorias, "Id", "Nome", anunciante.CategoriaId);
@@ -65,18 +88,19 @@ namespace MaisBahia.Controllers
         }
 
         // GET: Anunciantes/Edit/5
-        public ActionResult Edit(int? id)
+        public ActionResult Editar(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Anunciante anunciante = db.Anunciantes.Find(id);
+            Anunciante anunciante = anuncianteRepository.ObterPorId(id);
             if (anunciante == null)
             {
                 return HttpNotFound();
             }
             ViewBag.CategoriaId = new SelectList(db.Categorias, "Id", "Nome", anunciante.CategoriaId);
+
             ViewBag.PlanoId = new SelectList(db.Planos, "Id", "Nome", anunciante.PlanoId);
             return View(anunciante);
         }
@@ -86,13 +110,12 @@ namespace MaisBahia.Controllers
         // obter mais detalhes, consulte https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Nome,Endereco,Telefone,Email,Descricao,CategoriaId,PlanoId")] Anunciante anunciante)
+        public ActionResult Editar([Bind(Include = "Id,Nome,Endereco,Telefone,Email,Descricao,CategoriaId,PlanoId,FotoId")] Anunciante anunciante)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(anunciante).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                anuncianteRepository.Editar(anunciante);
+                return RedirectToAction("Lista");
             }
             ViewBag.CategoriaId = new SelectList(db.Categorias, "Id", "Nome", anunciante.CategoriaId);
             ViewBag.PlanoId = new SelectList(db.Planos, "Id", "Nome", anunciante.PlanoId);
@@ -100,13 +123,13 @@ namespace MaisBahia.Controllers
         }
 
         // GET: Anunciantes/Delete/5
-        public ActionResult Delete(int? id)
+        public ActionResult Excluir(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Anunciante anunciante = db.Anunciantes.Find(id);
+            Anunciante anunciante = anuncianteRepository.ObterPorId(id);
             if (anunciante == null)
             {
                 return HttpNotFound();
@@ -115,14 +138,12 @@ namespace MaisBahia.Controllers
         }
 
         // POST: Anunciantes/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("Excluir")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Anunciante anunciante = db.Anunciantes.Find(id);
-            db.Anunciantes.Remove(anunciante);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            anuncianteRepository.Excluir(id);
+            return RedirectToAction("Lista");
         }
 
         protected override void Dispose(bool disposing)
@@ -132,6 +153,19 @@ namespace MaisBahia.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public FileContentResult ObterImagem(int Id)
+        {
+            Anunciante anunciante = anuncianteRepository.ObterPorId(Id);
+            if (anunciante.ArquivoFoto != null)
+            {
+                return File(anunciante.ArquivoFoto, anunciante.MimeType);
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

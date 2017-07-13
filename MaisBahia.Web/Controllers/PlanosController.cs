@@ -6,121 +6,112 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using MaisBahia.AcessoDados;
+using MaisBahia.DataAccess;
 using MaisBahia.Models;
 
-namespace MaisBahia.Controllers
+namespace MaisBahia.Web.Controllers
 {
-    public class AnunciantesController : Controller
+    public class PlanosController : Controller
     {
-        private AnuncianteContexto db = new AnuncianteContexto();
+        private MaisBahiaContext db = new MaisBahiaContext();
 
-        // GET: Anunciantes
+        // GET: Planos
         public ActionResult Index()
         {
-            var anunciantes = db.Anunciantes.Include(a => a.Categoria).Include(a => a.Plano);
-            return View(anunciantes.ToList());
+            return View(db.Planos.ToList());
         }
 
-        // GET: Anunciantes/Details/5
+        // GET: Planos/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Anunciante anunciante = db.Anunciantes.Find(id);
-            if (anunciante == null)
+            Plano plano = db.Planos.Find(id);
+            if (plano == null)
             {
                 return HttpNotFound();
             }
-            return View(anunciante);
+            return View(plano);
         }
 
-        // GET: Anunciantes/Create
+        // GET: Planos/Create
         public ActionResult Create()
         {
-            ViewBag.CategoriaId = new SelectList(db.Categorias, "Id", "Nome");
-            ViewBag.PlanoId = new SelectList(db.Planos, "Id", "Nome");
             return View();
         }
 
-        // POST: Anunciantes/Create
+        // POST: Planos/Create
         // Para se proteger de mais ataques, ative as propriedades específicas a que você quer se conectar. Para 
         // obter mais detalhes, consulte https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,Nome,Endereco,Telefone,Email,Descricao,CategoriaId,PlanoId")] Anunciante anunciante)
+        public ActionResult Create([Bind(Include = "Id,Nome,Valor")] Plano plano)
         {
             if (ModelState.IsValid)
             {
-                db.Anunciantes.Add(anunciante);
+                db.Planos.Add(plano);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
-            ViewBag.CategoriaId = new SelectList(db.Categorias, "Id", "Nome", anunciante.CategoriaId);
-            ViewBag.PlanoId = new SelectList(db.Planos, "Id", "Nome", anunciante.PlanoId);
-            return View(anunciante);
+            return View(plano);
         }
 
-        // GET: Anunciantes/Edit/5
+        // GET: Planos/Edit/5
         public ActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Anunciante anunciante = db.Anunciantes.Find(id);
-            if (anunciante == null)
+            Plano plano = db.Planos.Find(id);
+            if (plano == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.CategoriaId = new SelectList(db.Categorias, "Id", "Nome", anunciante.CategoriaId);
-            ViewBag.PlanoId = new SelectList(db.Planos, "Id", "Nome", anunciante.PlanoId);
-            return View(anunciante);
+            return View(plano);
         }
 
-        // POST: Anunciantes/Edit/5
+        // POST: Planos/Edit/5
         // Para se proteger de mais ataques, ative as propriedades específicas a que você quer se conectar. Para 
         // obter mais detalhes, consulte https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Nome,Endereco,Telefone,Email,Descricao,CategoriaId,PlanoId")] Anunciante anunciante)
+        public ActionResult Edit([Bind(Include = "Id,Nome,Valor")] Plano plano)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(anunciante).State = EntityState.Modified;
+                db.Entry(plano).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.CategoriaId = new SelectList(db.Categorias, "Id", "Nome", anunciante.CategoriaId);
-            ViewBag.PlanoId = new SelectList(db.Planos, "Id", "Nome", anunciante.PlanoId);
-            return View(anunciante);
+            return View(plano);
         }
 
-        // GET: Anunciantes/Delete/5
+        // GET: Planos/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Anunciante anunciante = db.Anunciantes.Find(id);
-            if (anunciante == null)
+            Plano plano = db.Planos.Find(id);
+            if (plano == null)
             {
                 return HttpNotFound();
             }
-            return View(anunciante);
+            return View(plano);
         }
 
-        // POST: Anunciantes/Delete/5
+        // POST: Planos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Anunciante anunciante = db.Anunciantes.Find(id);
-            db.Anunciantes.Remove(anunciante);
+            Plano plano = db.Planos.Find(id);
+            db.Planos.Remove(plano);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

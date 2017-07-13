@@ -7,15 +7,15 @@
 <h2>Index</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Criar Novo", "Criar")
 </p>
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Categoria.Nome)
+            @Html.DisplayName("Categoria")
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Plano.Nome)
+            @Html.DisplayName("Plano")
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Nome)
@@ -64,11 +64,10 @@
         <td>
             @Html.DisplayFor(modelItem => item.Plano.Valor)
         </td>
-
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.ActionLink("Editar", "Editar", new { id=item.Id }) |
+            @Html.ActionLink("Detalhes", "Detalhar", new { id=item.Id }) |
+            @Html.ActionLink("Excluir", "Excluir", new { id=item.Id })
         </td>
     </tr>
 }

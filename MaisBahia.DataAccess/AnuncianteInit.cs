@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace MaisBahia.AcessoDados
+namespace MaisBahia.DataAccess
 {
-    public class AnuncianteInit: CreateDatabaseIfNotExists<AnuncianteContexto>
+    public class AnuncianteInit : CreateDatabaseIfNotExists<MaisBahiaContext>
     {
-        protected override void Seed(AnuncianteContexto contexto)
+        protected override void Seed(MaisBahiaContext contexto)
         {
             List<Categoria> categorias = new List<Categoria>()
             {
@@ -37,16 +38,13 @@ namespace MaisBahia.AcessoDados
             };
 
             categorias.ForEach(c => contexto.Categorias.Add(c));
-        
+
             List<Plano> planos = new List<Plano>()
             {
                 new Plano() { Nome = "Mensal", Valor=40.50F},
                 new Plano() { Nome = "Trimestral",Valor=30.75F },
                 new Plano() { Nome = "Anual",Valor=10.75F },
             };
-
-            planos.ForEach(p => contexto.Planos.Add(p));
-
 
             List<Anunciante> anunciantes = new List<Anunciante>()
             {
@@ -67,10 +65,10 @@ namespace MaisBahia.AcessoDados
                             Email = "email@santaluz.com.br",
                             Descricao ="Ambiente Climatizado",
                             Plano=planos.FirstOrDefault(p=>p.Nome=="Anual")
-                }         
+                }
             };
 
-            anunciantes.ForEach(a => contexto.Anunciantes.Add(a));
+            planos.ForEach(p => contexto.Planos.Add(p));
             contexto.SaveChanges();
         }
     }

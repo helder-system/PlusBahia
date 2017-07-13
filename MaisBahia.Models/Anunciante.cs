@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Text;
+using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MaisBahia.Models
-{ 
+{
     public class Anunciante
     {
         public int Id { get; set; }
@@ -19,7 +20,7 @@ namespace MaisBahia.Models
 
         [Required]
         [MaxLength(50)]
-        public string  Telefone { get; set; }
+        public string Telefone { get; set; }
 
         [Required]
         [MaxLength(50)]
@@ -28,7 +29,10 @@ namespace MaisBahia.Models
         [Required]
         [MaxLength(500)]
         public string Descricao { get; set; }
-        
+
+        public byte[] ArquivoFoto { get; set; }
+        public string MimeType { get; set; }
+
         public int CategoriaId { get; set; }
         public Categoria Categoria { get; set; }
 

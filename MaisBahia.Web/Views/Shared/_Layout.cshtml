@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@model MaisBahia.Models.Anunciante
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -26,9 +28,13 @@
                         Categorias
                         <span class="caret"></span>
                     </a>
-                    <ul class="dropdown-menu">
-                        <li>@Html.ActionLink("Engenharia e Serviços", "Anunciantes", "Cadastro")</li>
+                    <ul class="dropdown-menu">              
+                            @Html.DropDownList("CategoriaId", null, htmlAttributes: new { @class = "form-control" })
                     </ul>
+                    <div class="dropdown-menu">
+
+                    </div>
+
                 </li>
            </ul>
 
